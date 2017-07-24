@@ -1,0 +1,24 @@
+<package>
+  <description brief="rbot_100_driver">
+
+     This is R.Bot 100 driver based on reverse engineering of the robot. There are two nodes available, a light node which exposes odometry and velocity commands, and a full node which exposes all capabilities of the underlying library.
+
+  </description>
+  <author>Oleg Urzhumtcev</author>
+  <license>Apache</license>
+  <review status="unreviewed" notes=""/>
+  <url>https://github.com/NetBUG/rbot_100_ros_driver</url>
+  <export>
+    <cpp cflags="-I${prefix}/include" lflags="-L${prefix}/lib -Wl,-rpath,${prefix}/lib -lirobot_oi -lgo_dock"/>
+  </export>
+  <depend package="roscpp"/>
+  <depend package="actionlib"/>
+  <depend package="actionlib_msgs"/>
+  <depend package="tf"/>
+  <depend package="nav_msgs"/>
+  <depend package="geometry_msgs"/>
+  <depend package="cereal_port" />
+
+</package>
+
+

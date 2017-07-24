@@ -1,0 +1,13 @@
+<stack>
+  <description brief="rbot_100_driver">
+  	R.Bot 100 robot stack.
+  </description>
+  <author>Oleg Urzhumtcev</author>
+  <license>Apache</license>  
+  <review status="unreviewed" notes=""/>
+  <url>https://github.com/NetBUG/rbot_100_ros_driver</url>
+  <depend stack="ros" />			<!-- roscpp -->
+  <depend stack="common_msgs" /> 	<!-- nav_msgs, geometry_msgs -->
+  <depend stack="geometry" /> 		<!-- tf -->
+  
+</stack>
