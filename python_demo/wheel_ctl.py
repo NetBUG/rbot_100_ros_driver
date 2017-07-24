@@ -4,6 +4,7 @@ import serial
 import time
 import pygame, sys
 from pygame.locals import *
+from sys import platform as _platform
 
 pygame.init()
 pygame.display.set_mode((100,100))
@@ -59,10 +60,14 @@ def send(s, comment=None):
 
 if __name__ == '__main__':
   try:
-    ser = serial.Serial('/dev/tty.SLAB_USBtoUART', 57600, timeout=0.5)
+    if _platform.startswith('linux'):
+      ser = serial.Serial('/dev/ttyUSB0', 57600, timeout=0.5)
+    else: # Mac OS
+      ser = serial.Serial('/dev/tty.SLAB_USBtoUART', 57600, timeout=0.5)
   except:
     print ("Serial init failed!")
     ser = None
+    raise
   # Initialization
   for i in range(1, 10):
     send(initstr)
