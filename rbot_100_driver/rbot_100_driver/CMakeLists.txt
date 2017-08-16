@@ -40,7 +40,7 @@ rosbuild_add_library(irobot_oi src/rbot_100_series/RBotInterface.cpp)
 #rosbuild_add_executable(roomba560_node src/roomba560.cpp src/iRobot/OpenInterface.cpp src/GoDock/GoDock.cpp)
 #target_link_libraries(roomba560_node cereal_port)
 
-#rosbuild_add_executable(rbot100_light_node src/rbot100_lightweight.cpp src/rbot_100_series/RBotInterface.cpp)
+rosbuild_add_executable(rbot100_light_node src/rbot100_lightweight.cpp src/rbot_100_series/RBotInterface.cpp)
 #target_link_libraries(rbot100_light_node cereal_port)
 
 #rosbuild_add_executable(godock_server src/godock_server.cpp src/GoDock/GoDock.cpp)
