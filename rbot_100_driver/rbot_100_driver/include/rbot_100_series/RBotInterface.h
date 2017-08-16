@@ -1,39 +1,3 @@
-/*********************************************************************
-*
-* Software License Agreement (BSD License)
-*
-*  Copyright (c) 2010, ISR University of Coimbra.
-*  All rights reserved.
-*
-*  Redistribution and use in source and binary forms, with or without
-*  modification, are permitted provided that the following conditions
-*  are met:
-*
-*   * Redistributions of source code must retain the above copyright
-*     notice, this list of conditions and the following disclaimer.
-*   * Redistributions in binary form must reproduce the above
-*     copyright notice, this list of conditions and the following
-*     disclaimer in the documentation and/or other materials provided
-*     with the distribution.
-*   * Neither the name of the ISR University of Coimbra nor the names of its
-*     contributors may be used to endorse or promote products derived
-*     from this software without specific prior written permission.
-*
-*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-*  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-*  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-*  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-*  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-*  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-*  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-*  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-*  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-*  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
-*  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-*  POSSIBILITY OF SUCH DAMAGE.
-*
-* Author: Gonçalo Cabrita on 19/05/2010
-*********************************************************************/
 #include "cereal_port/CerealPort.h"
 
 // Packets sizes
@@ -173,7 +137,7 @@
 #define NORMALIZE(z) atan2(sin(z), cos(z))
 #endif
 
-namespace irobot
+namespace rbot
 {
 	//! OI op codes
 	/*!
@@ -285,12 +249,12 @@ namespace irobot
 	} OI_Packet_ID;
 
 
-	/*! \class OpenInterface OpenInterface.h "inc/OpenInterface.h"
-	 *  \brief C++ class implementation of the iRobot OI.
+	/*! \class RBotInterface RBotInterface.h "include/RBotInterface.h"
+	 *  \brief C++ class implementation of the RBot 100 Interface.
 	 *
-	 * This class implements the iRobot Open Interface protocolor as described by iRobot. Based on the Player Roomba driver writen by Brian Gerkey.
+	 * This class implements the RBot interface protocol reverse engineered by Oleg Urzhumtcev. Based on the OpenInterface for iRobot from Goncalo Cabritas.
 	 */
-	class OpenInterface
+	class RBotInterface
 	{
 		public:
 	
@@ -302,9 +266,9 @@ namespace irobot
 		 *
 		 *  \sa setSensorPackets()
 		 */
-		OpenInterface(const char * new_serial_port);
+		RBotInterface(const char * new_serial_port);
 		//! Destructor
-		~OpenInterface();
+		~RBotInterface();
 	
 		//! Open the serial port
 		/*!
@@ -314,7 +278,7 @@ namespace irobot
 		//! Close the serial port
 		int closeSerialPort();
 	
-		//! Power down the Roomba.
+		//! Power down the RBot. Additional testing needed.
 		int powerDown();
 	
 		//! Set sensor packets
@@ -330,7 +294,7 @@ namespace irobot
 		int setSensorPackets(OI_Packet_ID * new_sensor_packets, int new_num_of_packets, size_t new_buffer_size);
 		//! Read sensor packets
 		/*!
-		*  Requested the defined sensor packets from the Roomba. If you need odometry and you requested encoder data you need to call calculateOdometry() afterwords.
+		*  Requested the defined sensor packets from the Roomba. If you need odometry and you requested encoder data you need to call calculateOdometry() afterwards.
 		*
 		*  \param timeout		Timeout in milliseconds.
 		*

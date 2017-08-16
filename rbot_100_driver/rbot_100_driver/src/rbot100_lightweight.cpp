@@ -34,19 +34,19 @@
 *
 * Author: Gonçalo Cabrita on 07/10/2010
 *********************************************************************/
-#define NODE_VERSION 2.01
+#define NODE_VERSION 0.1
 
 #include <ros/ros.h>
 #include <tf/transform_broadcaster.h>
 #include <nav_msgs/Odometry.h>			// odom
 #include <geometry_msgs/Twist.h>		// cmd_vel
 
-#include "roomba_500_series/OpenInterface.h"
+#include "rbot_100_series/RBotInterface.h"
 
 #include <string>
 
 std::string port;
-irobot::OpenInterface * roomba;
+rbot::RBotInterface * rbot;
 
 
 std::string prefixTopic(std::string prefix, char * name)
@@ -59,15 +59,15 @@ std::string prefixTopic(std::string prefix, char * name)
 
 void cmdVelReceived(const geometry_msgs::Twist::ConstPtr& cmd_vel)
 {
-	roomba->drive(cmd_vel->linear.x, cmd_vel->angular.z);
+	rbot->drive(cmd_vel->linear.x, cmd_vel->angular.z);
 }
 
 
 int main(int argc, char** argv)
 {
-	ros::init(argc, argv, "roomba560_light_node");
+	ros::init(argc, argv, "rbot560_light_node");
 
-	ROS_INFO("Roomba for ROS %.2f", NODE_VERSION);
+	ROS_INFO("rbot for ROS %.2f", NODE_VERSION);
 	
 	double last_x, last_y, last_yaw;
 	double vel_x, vel_y, vel_yaw;
@@ -75,18 +75,18 @@ int main(int argc, char** argv)
 
 	ros::NodeHandle n;
 	
-	n.param<std::string>("roomba/port", port, "/dev/ttyUSB0");
+	n.param<std::string>("rbot/port", port, "/dev/ttyUSB0");
 	
-	roomba = new irobot::OpenInterface(port.c_str());
+	rbot = new rbot::OpenInterface(port.c_str());
 	
 	ros::Publisher odom_pub = n.advertise<nav_msgs::Odometry>("/odom", 50);
 	tf::TransformBroadcaster odom_broadcaster;
 	ros::Subscriber cmd_vel_sub  = n.subscribe<geometry_msgs::Twist>("/cmd_vel", 1, cmdVelReceived);
 
-	if( roomba->openSerialPort(true) == 0) ROS_INFO("Connected to Roomba.");
+	if( rbot->openSerialPort(true) == 0) ROS_INFO("Connected to rbot.");
 	else
 	{
-		ROS_FATAL("Could not connect to Roomba.");
+		ROS_FATAL("Could not connect to rbot.");
 		ROS_BREAK();
 	}
 
@@ -112,24 +112,24 @@ int main(int argc, char** argv)
 			heartvalue = 0;
 			inc=true;
 		}
-		roomba->setLeds(0, 0, 0, 0, (unsigned char)heartvalue, 255);*/
+		rbot->setLeds(0, 0, 0, 0, (unsigned char)heartvalue, 255);*/
 
 		current_time = ros::Time::now();
 		
-		last_x = roomba->odometry_x_;
-		last_y = roomba->odometry_y_;
-		last_yaw = roomba->odometry_yaw_;
+		last_x = rbot->odometry_x_;
+		last_y = rbot->odometry_y_;
+		last_yaw = rbot->odometry_yaw_;
 		
-		if( roomba->getSensorPackets(100) == -1) ROS_ERROR("Could not retrieve sensor packets.");
-		else roomba->calculateOdometry();
+		if( rbot->getSensorPackets(100) == -1) ROS_ERROR("Could not retrieve sensor packets.");
+		else rbot->calculateOdometry();
 		
 		dt = (current_time - last_time).toSec();
-		vel_x = (roomba->odometry_x_ - last_x)/dt;
-		vel_y = (roomba->odometry_y_ - last_y)/dt;
-		vel_yaw = (roomba->odometry_yaw_ - last_yaw)/dt;
+		vel_x = (rbot->odometry_x_ - last_x)/dt;
+		vel_y = (rbot->odometry_y_ - last_y)/dt;
+		vel_yaw = (rbot->odometry_yaw_ - last_yaw)/dt;
 		
 		//since all odometry is 6DOF we'll need a quaternion created from yaw
-		geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(roomba->odometry_yaw_);
+		geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(rbot->odometry_yaw_);
 		
 		//first, we'll publish the transform over tf
 		geometry_msgs::TransformStamped odom_trans;
@@ -137,8 +137,8 @@ int main(int argc, char** argv)
 		odom_trans.header.frame_id = "odom";
 		odom_trans.child_frame_id = "base_link";
 		
-		odom_trans.transform.translation.x = roomba->odometry_x_;
-		odom_trans.transform.translation.y = roomba->odometry_y_;
+		odom_trans.transform.translation.x = rbot->odometry_x_;
+		odom_trans.transform.translation.y = rbot->odometry_y_;
 		odom_trans.transform.translation.z = 0.0;
 		odom_trans.transform.rotation = odom_quat;
 		
@@ -151,8 +151,8 @@ int main(int argc, char** argv)
 		odom.header.frame_id = "odom";
 		
 		//set the position
-		odom.pose.pose.position.x = roomba->odometry_x_;
-		odom.pose.pose.position.y = roomba->odometry_y_;
+		odom.pose.pose.position.x = rbot->odometry_x_;
+		odom.pose.pose.position.y = rbot->odometry_y_;
 		odom.pose.pose.position.z = 0.0;
 		odom.pose.pose.orientation = odom_quat;
 		
@@ -169,8 +169,8 @@ int main(int argc, char** argv)
 		r.sleep();
 	}
 	
-	roomba->powerDown();
-	roomba->closeSerialPort();
+	rbot->powerDown();
+	rbot->closeSerialPort();
 }
 
 // EOF

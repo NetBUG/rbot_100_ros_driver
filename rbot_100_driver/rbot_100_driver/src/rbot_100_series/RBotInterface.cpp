@@ -42,11 +42,11 @@
 #include <netinet/in.h>
 #include <sys/types.h>
 
-#include "roomba_500_series/OpenInterface.h"
+#include "rbot_100_series/RBotInterface.h"
 
 // *****************************************************************************
 // Constructor
-irobot::OpenInterface::OpenInterface(const char * new_serial_port)
+rbot::RBotInterface::RBotInterface(const char * new_serial_port)
 {	
 	port_name_ = new_serial_port;
 
@@ -74,7 +74,7 @@ irobot::OpenInterface::OpenInterface(const char * new_serial_port)
 
 // *****************************************************************************
 // Destructor
-irobot::OpenInterface::~OpenInterface()
+rbot::RBotInterface::~RBotInterface()
 {
 	// Clean up!
 	delete serial_port_;
@@ -83,7 +83,7 @@ irobot::OpenInterface::~OpenInterface()
 
 // *****************************************************************************
 // Open the serial port
-int irobot::OpenInterface::openSerialPort(bool full_control)
+int rbot::RBotInterface::openSerialPort(bool full_control)
 {
 	try{ serial_port_->open(port_name_.c_str(), 115200); }
 	catch(cereal::Exception& e){ return(-1); }
@@ -96,7 +96,7 @@ int irobot::OpenInterface::openSerialPort(bool full_control)
 
 // *****************************************************************************
 // Set the mode
-int irobot::OpenInterface::startOI(bool full_control)
+int rbot::RBotInterface::startOI(bool full_control)
 {	
 	char buffer[1];
 
@@ -126,7 +126,7 @@ int irobot::OpenInterface::startOI(bool full_control)
 
 // *****************************************************************************
 // Close the serial port
-int irobot::OpenInterface::closeSerialPort()
+int rbot::RBotInterface::closeSerialPort()
 {
 	this->drive(0.0, 0.0);
 	usleep(OI_DELAY_MODECHANGE_MS * 1e3);
@@ -139,8 +139,8 @@ int irobot::OpenInterface::closeSerialPort()
 
 
 // *****************************************************************************
-// Send an OP code to the roomba
-int irobot::OpenInterface::sendOpcode(OI_Opcode code)
+// Send an OP code to the rbot
+int rbot::RBotInterface::sendOpcode(OI_Opcode code)
 {
 	char to_send = code;
 	try{ serial_port_->write(&to_send, 1); }
@@ -150,8 +150,8 @@ int irobot::OpenInterface::sendOpcode(OI_Opcode code)
 
 
 // *****************************************************************************
-// Power down the roomba
-int irobot::OpenInterface::powerDown()
+// Power down the rbot
+int rbot::RBotInterface::powerDown()
 {
 	return sendOpcode(OI_OPCODE_POWER);
 }
@@ -159,10 +159,10 @@ int irobot::OpenInterface::powerDown()
 
 // *****************************************************************************
 // Set the speeds
-int irobot::OpenInterface::drive(double linear_speed, double angular_speed)
+int rbot::RBotInterface::drive(double linear_speed, double angular_speed)
 {
-	int left_speed_mm_s = (int)((linear_speed-ROOMBA_AXLE_LENGTH*angular_speed/2)*1e3);		// Left wheel velocity in mm/s
-	int right_speed_mm_s = (int)((linear_speed+ROOMBA_AXLE_LENGTH*angular_speed/2)*1e3);	// Right wheel velocity in mm/s
+	int left_speed_mm_s = (int)((linear_speed - ROOMBA_AXLE_LENGTH * angular_speed / 2) * 1e3);		// Left wheel velocity in mm/s
+	int right_speed_mm_s = (int)((linear_speed + ROOMBA_AXLE_LENGTH * angular_speed / 2) * 1e3);	// Right wheel velocity in mm/s
 	
 	return this->driveDirect(left_speed_mm_s, right_speed_mm_s);
 }
@@ -170,7 +170,7 @@ int irobot::OpenInterface::drive(double linear_speed, double angular_speed)
 
 // *****************************************************************************
 // Set the motor speeds
-int irobot::OpenInterface::driveDirect(int left_speed, int right_speed)
+int rbot::RBotInterface::driveDirect(int left_speed, int right_speed)
 {
 	// Limit velocity
 	int16_t left_speed_mm_s = MAX(left_speed, -ROOMBA_MAX_LIN_VEL_MM_S);
@@ -195,7 +195,7 @@ int irobot::OpenInterface::driveDirect(int left_speed, int right_speed)
 
 // *****************************************************************************
 // Set the motor PWMs
-int irobot::OpenInterface::drivePWM(int left_pwm, int right_pwm)
+int rbot::RBotInterface::drivePWM(int left_pwm, int right_pwm)
 {
 	// TODO: Not yet implemented... Doesnt really matter.
 	return(-1);
@@ -204,7 +204,7 @@ int irobot::OpenInterface::drivePWM(int left_pwm, int right_pwm)
 
 // *****************************************************************************
 // Set the brushes motors status
-int irobot::OpenInterface::brushes(unsigned char side_brush, unsigned char vacuum, unsigned char main_brush, unsigned char side_brush_clockwise, unsigned char main_brush_dir)
+int rbot::RBotInterface::brushes(unsigned char side_brush, unsigned char vacuum, unsigned char main_brush, unsigned char side_brush_clockwise, unsigned char main_brush_dir)
 {
 	unsigned char cmd_buffer[2];
 	cmd_buffer[0] = OI_OPCODE_MOTORS;
@@ -217,7 +217,7 @@ int irobot::OpenInterface::brushes(unsigned char side_brush, unsigned char vacuu
 
 // *****************************************************************************
 // Set the brushes motors PWMs
-int irobot::OpenInterface::brushesPWM(char main_brush, char side_brush, char vacuum)
+int rbot::RBotInterface::brushesPWM(char main_brush, char side_brush, char vacuum)
 {
 	char cmd_buffer[4];
 	cmd_buffer[0] = (char)OI_OPCODE_PWM_MOTORS;
@@ -233,7 +233,7 @@ int irobot::OpenInterface::brushesPWM(char main_brush, char side_brush, char vac
 
 // *****************************************************************************
 // Set the sensors to read
-int irobot::OpenInterface::setSensorPackets(OI_Packet_ID * new_sensor_packets, int new_num_of_packets, size_t new_buffer_size)
+int rbot::RBotInterface::setSensorPackets(OI_Packet_ID * new_sensor_packets, int new_num_of_packets, size_t new_buffer_size)
 {
 	if(sensor_packets_ == NULL)
 	{
@@ -256,7 +256,7 @@ int irobot::OpenInterface::setSensorPackets(OI_Packet_ID * new_sensor_packets, i
 
 // *****************************************************************************
 // Read the sensors
-int irobot::OpenInterface::getSensorPackets(int timeout)
+int rbot::RBotInterface::getSensorPackets(int timeout)
 {
 	char cmd_buffer[num_of_packets_+2];
 	char data_buffer[packets_size_];
@@ -281,7 +281,7 @@ int irobot::OpenInterface::getSensorPackets(int timeout)
 
 // *****************************************************************************
 // Read the sensors stream
-int irobot::OpenInterface::streamSensorPackets()
+int rbot::RBotInterface::streamSensorPackets()
 {
 	char data_buffer[packets_size_];
 
@@ -306,7 +306,7 @@ int irobot::OpenInterface::streamSensorPackets()
 	return this->parseSensorPackets((unsigned char*)data_buffer, packets_size_);
 }
 
-int irobot::OpenInterface::startStream()
+int rbot::RBotInterface::startStream()
 {
 	char data_buffer[2];
 
@@ -318,7 +318,7 @@ int irobot::OpenInterface::startStream()
 	return(0);
 }
 
-int irobot::OpenInterface::stopStream()
+int rbot::RBotInterface::stopStream()
 {
 	char data_buffer[2];
 
@@ -333,7 +333,7 @@ int irobot::OpenInterface::stopStream()
 
 // *****************************************************************************
 // Parse sensor data
-int irobot::OpenInterface::parseSensorPackets(unsigned char * buffer , size_t buffer_lenght)
+int rbot::RBotInterface::parseSensorPackets(unsigned char * buffer , size_t buffer_lenght)
 {	
 	if(buffer_lenght != packets_size_)
 	{
@@ -806,7 +806,7 @@ int irobot::OpenInterface::parseSensorPackets(unsigned char * buffer , size_t bu
 	return(0);
 }
 
-int irobot::OpenInterface::parseBumpersAndWheeldrops(unsigned char * buffer, int index)
+int rbot::RBotInterface::parseBumpersAndWheeldrops(unsigned char * buffer, int index)
 {
 	// Bumps, wheeldrops	
 	this->bumper_[RIGHT] = (buffer[index]) & 0x01;
@@ -817,7 +817,7 @@ int irobot::OpenInterface::parseBumpersAndWheeldrops(unsigned char * buffer, int
 	return OI_PACKET_BUMPS_DROPS_SIZE;
 }
 
-int irobot::OpenInterface::parseWall(unsigned char * buffer, int index)
+int rbot::RBotInterface::parseWall(unsigned char * buffer, int index)
 {
 	// Wall
 	this->wall_ = buffer[index] & 0x01;
@@ -825,7 +825,7 @@ int irobot::OpenInterface::parseWall(unsigned char * buffer, int index)
 	return OI_PACKET_WALL_SIZE;
 }
 	
-int irobot::OpenInterface::parseLeftCliff(unsigned char * buffer, int index)
+int rbot::RBotInterface::parseLeftCliff(unsigned char * buffer, int index)
 {
 	// Cliffs
 	this->cliff_[LEFT] = buffer[index] & 0x01;
@@ -833,7 +833,7 @@ int irobot::OpenInterface::parseLeftCliff(unsigned char * buffer, int index)
 	return OI_PACKET_CLIFF_LEFT_SIZE;
 }
 
-int irobot::OpenInterface::parseFrontLeftCliff(unsigned char * buffer, int index)
+int rbot::RBotInterface::parseFrontLeftCliff(unsigned char * buffer, int index)
 {
 	// Cliffs
 	this->cliff_[FRONT_LEFT] = buffer[index] & 0x01;
@@ -841,7 +841,7 @@ int irobot::OpenInterface::parseFrontLeftCliff(unsigned char * buffer, int index
 	return OI_PACKET_CLIFF_FRONT_LEFT_SIZE;
 }
 
-int irobot::OpenInterface::parseFrontRightCliff(unsigned char * buffer, int index)
+int rbot::RBotInterface::parseFrontRightCliff(unsigned char * buffer, int index)
 {
 	// Cliffs
 	this->cliff_[FRONT_RIGHT] = buffer[index] & 0x01;
@@ -849,7 +849,7 @@ int irobot::OpenInterface::parseFrontRightCliff(unsigned char * buffer, int inde
 	return OI_PACKET_CLIFF_FRONT_RIGHT_SIZE;
 }
 
-int irobot::OpenInterface::parseRightCliff(unsigned char * buffer, int index)
+int rbot::RBotInterface::parseRightCliff(unsigned char * buffer, int index)
 {
 	// Cliffs
 	this->cliff_[RIGHT] = buffer[index] & 0x01;
@@ -857,7 +857,7 @@ int irobot::OpenInterface::parseRightCliff(unsigned char * buffer, int index)
 	return OI_PACKET_CLIFF_RIGHT_SIZE;
 }
 
-int irobot::OpenInterface::parseVirtualWall(unsigned char * buffer, int index)
+int rbot::RBotInterface::parseVirtualWall(unsigned char * buffer, int index)
 {
 	// Virtual Wall
 	this->virtual_wall_ = buffer[index] & 0x01;
@@ -865,7 +865,7 @@ int irobot::OpenInterface::parseVirtualWall(unsigned char * buffer, int index)
 	return OI_PACKET_VIRTUAL_WALL_SIZE;
 }
 	
-int irobot::OpenInterface::parseOvercurrents(unsigned char * buffer, int index)
+int rbot::RBotInterface::parseOvercurrents(unsigned char * buffer, int index)
 {
 	// Overcurrent
 	unsigned char byte = buffer[index];
@@ -878,7 +878,7 @@ int irobot::OpenInterface::parseOvercurrents(unsigned char * buffer, int index)
 	return OI_PACKET_WHEEL_OVERCURRENTS_SIZE;
 }
 
-int irobot::OpenInterface::parseDirtDetector(unsigned char * buffer, int index)
+int rbot::RBotInterface::parseDirtDetector(unsigned char * buffer, int index)
 {
 	// Dirt Detector
 	this->dirt_detect_ = buffer[index];
@@ -886,7 +886,7 @@ int irobot::OpenInterface::parseDirtDetector(unsigned char * buffer, int index)
 	return OI_PACKET_DIRT_DETECT_SIZE;
 }
 	
-int irobot::OpenInterface::parseIrOmniChar(unsigned char * buffer, int index)
+int rbot::RBotInterface::parseIrOmniChar(unsigned char * buffer, int index)
 {
 	// Infrared Character Omni
 	this->ir_char_[OMNI] = buffer[index];
@@ -894,7 +894,7 @@ int irobot::OpenInterface::parseIrOmniChar(unsigned char * buffer, int index)
 	return OI_PACKET_IR_CHAR_OMNI_SIZE;
 }
 
-int irobot::OpenInterface::parseButtons(unsigned char * buffer, int index)
+int rbot::RBotInterface::parseButtons(unsigned char * buffer, int index)
 {
 	// Buttons
 	for(int i=0 ; i<8 ; i++) this->buttons_[i] = (buffer[index] >> i) & 0x01;
@@ -902,7 +902,7 @@ int irobot::OpenInterface::parseButtons(unsigned char * buffer, int index)
 	return OI_PACKET_BUTTONS_SIZE;
 }
 	
-int irobot::OpenInterface::parseDistance(unsigned char * buffer, int index)
+int rbot::RBotInterface::parseDistance(unsigned char * buffer, int index)
 {
 	// Distance
 	this->distance_ = buffer2signed_int(buffer, index);
@@ -910,7 +910,7 @@ int irobot::OpenInterface::parseDistance(unsigned char * buffer, int index)
 	return OI_PACKET_DISTANCE_SIZE;
 }
 
-int irobot::OpenInterface::parseAngle(unsigned char * buffer, int index)
+int rbot::RBotInterface::parseAngle(unsigned char * buffer, int index)
 {
 	// Angle
 	this->angle_ = buffer2signed_int(buffer, index);
@@ -918,7 +918,7 @@ int irobot::OpenInterface::parseAngle(unsigned char * buffer, int index)
 	return OI_PACKET_ANGLE_SIZE;
 }
 	
-int irobot::OpenInterface::parseChargingState(unsigned char * buffer, int index)
+int rbot::RBotInterface::parseChargingState(unsigned char * buffer, int index)
 {
 	// Charging State
 	unsigned char byte = buffer[index];
@@ -929,7 +929,7 @@ int irobot::OpenInterface::parseChargingState(unsigned char * buffer, int index)
 	return OI_PACKET_CHARGING_STATE_SIZE;
 }
 
-int irobot::OpenInterface::parseVoltage(unsigned char * buffer, int index)
+int rbot::RBotInterface::parseVoltage(unsigned char * buffer, int index)
 {
 	// Voltage
 	this->voltage_ = (float)(buffer2unsigned_int(buffer, index) / 1000.0);
@@ -937,7 +937,7 @@ int irobot::OpenInterface::parseVoltage(unsigned char * buffer, int index)
 	return OI_PACKET_VOLTAGE_SIZE;
 }
 
-int irobot::OpenInterface::parseCurrent(unsigned char * buffer, int index)
+int rbot::RBotInterface::parseCurrent(unsigned char * buffer, int index)
 {
 	// Current
 	this->current_ = (float)(buffer2signed_int(buffer, index) / 1000.0);
@@ -945,7 +945,7 @@ int irobot::OpenInterface::parseCurrent(unsigned char * buffer, int index)
 	return OI_PACKET_CURRENT_SIZE;
 }
 
-int irobot::OpenInterface::parseTemperature(unsigned char * buffer, int index)
+int rbot::RBotInterface::parseTemperature(unsigned char * buffer, int index)
 {
 	// Temperature
 	this->temperature_ = (char)(buffer[index]);
@@ -953,7 +953,7 @@ int irobot::OpenInterface::parseTemperature(unsigned char * buffer, int index)
 	return OI_PACKET_TEMPERATURE_SIZE;
 }
 
-int irobot::OpenInterface::parseBatteryCharge(unsigned char * buffer, int index)
+int rbot::RBotInterface::parseBatteryCharge(unsigned char * buffer, int index)
 {
 	// Charge
 	this->charge_ = (float)(buffer2unsigned_int(buffer, index) / 1000.0);
@@ -961,7 +961,7 @@ int irobot::OpenInterface::parseBatteryCharge(unsigned char * buffer, int index)
 	return OI_PACKET_BATTERY_CHARGE_SIZE;
 }
 
-int irobot::OpenInterface::parseBatteryCapacity(unsigned char * buffer, int index)
+int rbot::RBotInterface::parseBatteryCapacity(unsigned char * buffer, int index)
 {
 	// Capacity
 	this->capacity_ = (float)(buffer2unsigned_int(buffer, index) / 1000.0);
@@ -969,7 +969,7 @@ int irobot::OpenInterface::parseBatteryCapacity(unsigned char * buffer, int inde
 	return OI_PACKET_BATTERY_CAPACITY_SIZE;
 }
 	
-int irobot::OpenInterface::parseWallSignal(unsigned char * buffer, int index)
+int rbot::RBotInterface::parseWallSignal(unsigned char * buffer, int index)
 {
 	// Wall signal
 	this->wall_signal_ = buffer2unsigned_int(buffer, index);
@@ -977,7 +977,7 @@ int irobot::OpenInterface::parseWallSignal(unsigned char * buffer, int index)
 	return OI_PACKET_WALL_SIGNAL_SIZE;
 }
 	
-int irobot::OpenInterface::parseLeftCliffSignal(unsigned char * buffer, int index)
+int rbot::RBotInterface::parseLeftCliffSignal(unsigned char * buffer, int index)
 {
 	// Cliff signals
 	this->cliff_signal_[LEFT] = buffer2unsigned_int(buffer, index);
@@ -985,7 +985,7 @@ int irobot::OpenInterface::parseLeftCliffSignal(unsigned char * buffer, int inde
 	return OI_PACKET_CLIFF_LEFT_SIGNAL_SIZE;
 }
 
-int irobot::OpenInterface::parseFrontLeftCliffSignal(unsigned char * buffer, int index)
+int rbot::RBotInterface::parseFrontLeftCliffSignal(unsigned char * buffer, int index)
 {
 	// Cliff signals
 	this->cliff_signal_[FRONT_LEFT] = buffer2unsigned_int(buffer, index);
@@ -993,7 +993,7 @@ int irobot::OpenInterface::parseFrontLeftCliffSignal(unsigned char * buffer, int
 	return OI_PACKET_CLIFF_FRONT_LEFT_SIGNAL_SIZE;
 }
 	
-int irobot::OpenInterface::parseFontRightCliffSignal(unsigned char * buffer, int index)
+int rbot::RBotInterface::parseFontRightCliffSignal(unsigned char * buffer, int index)
 {
 	// Cliff signals
 	this->cliff_signal_[FRONT_RIGHT] = buffer2unsigned_int(buffer, index);
@@ -1001,7 +1001,7 @@ int irobot::OpenInterface::parseFontRightCliffSignal(unsigned char * buffer, int
 	return OI_PACKET_CLIFF_FRONT_RIGHT_SIGNAL_SIZE;
 }
 
-int irobot::OpenInterface::parseRightCliffSignal(unsigned char * buffer, int index)
+int rbot::RBotInterface::parseRightCliffSignal(unsigned char * buffer, int index)
 {
 	// Cliff signals
 	this->cliff_signal_[RIGHT] = buffer2unsigned_int(buffer, index);
@@ -1009,7 +1009,7 @@ int irobot::OpenInterface::parseRightCliffSignal(unsigned char * buffer, int ind
 	return OI_PACKET_CLIFF_RIGHT_SIGNAL_SIZE;
 }	
 	
-int irobot::OpenInterface::parseChargingSource(unsigned char * buffer, int index)
+int rbot::RBotInterface::parseChargingSource(unsigned char * buffer, int index)
 {
 	// Charging soruces available
 	this->power_cord_ = (buffer[index] >> 0) & 0x01;
@@ -1018,56 +1018,56 @@ int irobot::OpenInterface::parseChargingSource(unsigned char * buffer, int index
 	return OI_PACKET_CHARGE_SOURCES_SIZE;
 }
 
-int irobot::OpenInterface::parseOiMode(unsigned char * buffer, int index)
+int rbot::RBotInterface::parseOiMode(unsigned char * buffer, int index)
 {
 	this->OImode_ = buffer[index];
 
 	return OI_PACKET_OI_MODE_SIZE;
 }
 
-int irobot::OpenInterface::parseSongNumber(unsigned char * buffer, int index)
+int rbot::RBotInterface::parseSongNumber(unsigned char * buffer, int index)
 {
 	// TODO
 	return OI_PACKET_SONG_NUMBER_SIZE;
 }
 
-int irobot::OpenInterface::parseSongPlaying(unsigned char * buffer, int index)
+int rbot::RBotInterface::parseSongPlaying(unsigned char * buffer, int index)
 {
 	// TODO
 	return OI_PACKET_SONG_PLAYING_SIZE;
 }
 
-int irobot::OpenInterface::parseNumberOfStreamPackets(unsigned char * buffer, int index)
+int rbot::RBotInterface::parseNumberOfStreamPackets(unsigned char * buffer, int index)
 {
 	// TODO
 	return OI_PACKET_STREAM_PACKETS_SIZE;
 }
 
-int irobot::OpenInterface::parseRequestedVelocity(unsigned char * buffer, int index)
+int rbot::RBotInterface::parseRequestedVelocity(unsigned char * buffer, int index)
 {
 	// TODO
 	return OI_PACKET_REQ_VELOCITY_SIZE;
 }
 
-int irobot::OpenInterface::parseRequestedRadius(unsigned char * buffer, int index)
+int rbot::RBotInterface::parseRequestedRadius(unsigned char * buffer, int index)
 {
 	// TODO
 	return OI_PACKET_REQ_RADIUS_SIZE;
 }
 
-int irobot::OpenInterface::parseRequestedRightVelocity(unsigned char * buffer, int index)
+int rbot::RBotInterface::parseRequestedRightVelocity(unsigned char * buffer, int index)
 {
 	// TODO
 	return OI_PACKET_REQ_RIGHT_VELOCITY_SIZE;
 }
 
-int irobot::OpenInterface::parseRequestedLeftVelocity(unsigned char * buffer, int index)
+int rbot::RBotInterface::parseRequestedLeftVelocity(unsigned char * buffer, int index)
 {
 	// TODO
 	return OI_PACKET_REQ_LEFT_VELOCITY_SIZE;
 }
 
-int irobot::OpenInterface::parseRightEncoderCounts(unsigned char * buffer, int index)
+int rbot::RBotInterface::parseRightEncoderCounts(unsigned char * buffer, int index)
 {
 	// Right encoder counts
 	uint16_t right_encoder_counts = buffer2unsigned_int(buffer, index);
@@ -1090,7 +1090,7 @@ int irobot::OpenInterface::parseRightEncoderCounts(unsigned char * buffer, int i
 	return OI_PACKET_RIGHT_ENCODER_SIZE;
 }
 
-int irobot::OpenInterface::parseLeftEncoderCounts(unsigned char * buffer, int index)
+int rbot::RBotInterface::parseLeftEncoderCounts(unsigned char * buffer, int index)
 {
 	// Left encoder counts
 	uint16_t left_encoder_counts = buffer2unsigned_int(buffer, index);
@@ -1113,7 +1113,7 @@ int irobot::OpenInterface::parseLeftEncoderCounts(unsigned char * buffer, int in
 	return OI_PACKET_LEFT_ENCODER_SIZE;
 }
 	
-int irobot::OpenInterface::parseLightBumper(unsigned char * buffer, int index)
+int rbot::RBotInterface::parseLightBumper(unsigned char * buffer, int index)
 {
 	// Light bumper
 	this->ir_bumper_[LEFT] = (buffer[index]) & 0x01;
@@ -1126,7 +1126,7 @@ int irobot::OpenInterface::parseLightBumper(unsigned char * buffer, int index)
 	return OI_PACKET_LIGHT_BUMPER_SIZE;
 }
 
-int irobot::OpenInterface::parseLightBumperLeftSignal(unsigned char * buffer, int index)
+int rbot::RBotInterface::parseLightBumperLeftSignal(unsigned char * buffer, int index)
 {
 	// Light bumper signal
 	this->ir_bumper_signal_[LEFT] = buffer2unsigned_int(buffer, index);
@@ -1134,7 +1134,7 @@ int irobot::OpenInterface::parseLightBumperLeftSignal(unsigned char * buffer, in
 	return OI_PACKET_LIGHT_BUMPER_LEFT_SIZE;
 }
 
-int irobot::OpenInterface::parseLightBumperFrontLeftSignal(unsigned char * buffer, int index)
+int rbot::RBotInterface::parseLightBumperFrontLeftSignal(unsigned char * buffer, int index)
 {
 	// Light bumper signal
 	this->ir_bumper_signal_[FRONT_LEFT] = buffer2unsigned_int(buffer, index);
@@ -1142,7 +1142,7 @@ int irobot::OpenInterface::parseLightBumperFrontLeftSignal(unsigned char * buffe
 	return OI_PACKET_LIGHT_BUMPER_FRONT_LEFT_SIZE;
 }
 
-int irobot::OpenInterface::parseLightBumperCenterLeftSignal(unsigned char * buffer, int index)
+int rbot::RBotInterface::parseLightBumperCenterLeftSignal(unsigned char * buffer, int index)
 {
 	// Light bumper signal
 	this->ir_bumper_signal_[CENTER_LEFT] = buffer2unsigned_int(buffer, index);
@@ -1150,7 +1150,7 @@ int irobot::OpenInterface::parseLightBumperCenterLeftSignal(unsigned char * buff
 	return OI_PACKET_LIGHT_BUMPER_CENTER_LEFT_SIZE;
 }
 
-int irobot::OpenInterface::parseLightBumperCenterRightSignal(unsigned char * buffer, int index)
+int rbot::RBotInterface::parseLightBumperCenterRightSignal(unsigned char * buffer, int index)
 {
 	// Light bumper signal
 	this->ir_bumper_signal_[CENTER_RIGHT] = buffer2unsigned_int(buffer, index);
@@ -1158,7 +1158,7 @@ int irobot::OpenInterface::parseLightBumperCenterRightSignal(unsigned char * buf
 	return OI_PACKET_LIGHT_BUMPER_CENTER_RIGHT_SIZE;
 }
 
-int irobot::OpenInterface::parseLightBumperFrontRightSignal(unsigned char * buffer, int index)
+int rbot::RBotInterface::parseLightBumperFrontRightSignal(unsigned char * buffer, int index)
 {
 	// Light bumper signal
 	this->ir_bumper_signal_[FRONT_RIGHT] = buffer2unsigned_int(buffer, index);
@@ -1166,7 +1166,7 @@ int irobot::OpenInterface::parseLightBumperFrontRightSignal(unsigned char * buff
 	return OI_PACKET_LIGHT_BUMPER_FRONT_RIGHT_SIZE;
 }
 	
-int irobot::OpenInterface::parseLightBumperRightSignal(unsigned char * buffer, int index)
+int rbot::RBotInterface::parseLightBumperRightSignal(unsigned char * buffer, int index)
 {
 	// Light bumper signal
 	this->ir_bumper_signal_[RIGHT] = buffer2unsigned_int(buffer, index);
@@ -1174,7 +1174,7 @@ int irobot::OpenInterface::parseLightBumperRightSignal(unsigned char * buffer, i
 	return OI_PACKET_LIGHT_BUMPER_RIGHT_SIZE;
 }
 
-int irobot::OpenInterface::parseIrCharLeft(unsigned char * buffer, int index)
+int rbot::RBotInterface::parseIrCharLeft(unsigned char * buffer, int index)
 {
 	// Infrared character left
 	this->ir_char_[LEFT] = buffer[index];
@@ -1182,7 +1182,7 @@ int irobot::OpenInterface::parseIrCharLeft(unsigned char * buffer, int index)
 	return OI_PACKET_IR_CHAR_LEFT_SIZE;
 }
 	
-int irobot::OpenInterface::parseIrCharRight(unsigned char * buffer, int index)
+int rbot::RBotInterface::parseIrCharRight(unsigned char * buffer, int index)
 {
 	// Infrared character left
 	this->ir_char_[RIGHT] = buffer[index];
@@ -1190,7 +1190,7 @@ int irobot::OpenInterface::parseIrCharRight(unsigned char * buffer, int index)
 	return OI_PACKET_IR_CHAR_RIGHT_SIZE;
 }
 	
-int irobot::OpenInterface::parseLeftMotorCurrent(unsigned char * buffer, int index)
+int rbot::RBotInterface::parseLeftMotorCurrent(unsigned char * buffer, int index)
 {
 	// Left motor current
 	this->motor_current_[LEFT] = buffer2signed_int(buffer, index);
@@ -1198,7 +1198,7 @@ int irobot::OpenInterface::parseLeftMotorCurrent(unsigned char * buffer, int ind
 	return OI_PACKET_LEFT_MOTOR_CURRENT_SIZE;
 }
 
-int irobot::OpenInterface::parseRightMotorCurrent(unsigned char * buffer, int index)
+int rbot::RBotInterface::parseRightMotorCurrent(unsigned char * buffer, int index)
 {
 	// Left motor current
 	this->motor_current_[RIGHT] = buffer2signed_int(buffer, index);
@@ -1206,7 +1206,7 @@ int irobot::OpenInterface::parseRightMotorCurrent(unsigned char * buffer, int in
 	return OI_PACKET_RIGHT_MOTOR_CURRENT_SIZE;
 }
 
-int irobot::OpenInterface::parseMainBrushMotorCurrent(unsigned char * buffer, int index)
+int rbot::RBotInterface::parseMainBrushMotorCurrent(unsigned char * buffer, int index)
 {
 	// Main brush motor current
 	this->motor_current_[MAIN_BRUSH] = buffer2signed_int(buffer, index);
@@ -1214,7 +1214,7 @@ int irobot::OpenInterface::parseMainBrushMotorCurrent(unsigned char * buffer, in
 	return OI_PACKET_BRUSH_MOTOR_CURRENT_SIZE;
 }
 
-int irobot::OpenInterface::parseSideBrushMotorCurrent(unsigned char * buffer, int index)
+int rbot::RBotInterface::parseSideBrushMotorCurrent(unsigned char * buffer, int index)
 {
 	// Main brush motor current
 	this->motor_current_[SIDE_BRUSH] = buffer2signed_int(buffer, index);
@@ -1222,7 +1222,7 @@ int irobot::OpenInterface::parseSideBrushMotorCurrent(unsigned char * buffer, in
 	return OI_PACKET_SIDE_BRUSH_MOTOR_CURRENT_SIZE;
 }
 
-int irobot::OpenInterface::parseStasis(unsigned char * buffer, int index)
+int rbot::RBotInterface::parseStasis(unsigned char * buffer, int index)
 {
 	// Stasis
 	this->stasis_ = (buffer[index] >> 0) & 0x01;
@@ -1230,7 +1230,7 @@ int irobot::OpenInterface::parseStasis(unsigned char * buffer, int index)
 	return OI_PACKET_STASIS_SIZE;
 }
 
-int irobot::OpenInterface::buffer2signed_int(unsigned char * buffer, int index)
+int rbot::RBotInterface::buffer2signed_int(unsigned char * buffer, int index)
 {
 	int16_t signed_int;
 	
@@ -1240,7 +1240,7 @@ int irobot::OpenInterface::buffer2signed_int(unsigned char * buffer, int index)
 	return (int)signed_int;
 }
 
-int irobot::OpenInterface::buffer2unsigned_int(unsigned char * buffer, int index)
+int rbot::RBotInterface::buffer2unsigned_int(unsigned char * buffer, int index)
 {
 	uint16_t unsigned_int;
 
@@ -1253,7 +1253,7 @@ int irobot::OpenInterface::buffer2unsigned_int(unsigned char * buffer, int index
 
 // *****************************************************************************
 // Calculate Roomba odometry
-void irobot::OpenInterface::calculateOdometry()
+void rbot::RBotInterface::calculateOdometry()
 {	
 	double dist = (encoder_counts_[RIGHT]*ROOMBA_PULSES_TO_M + encoder_counts_[LEFT]*ROOMBA_PULSES_TO_M) / 2.0; 
 	double ang = (encoder_counts_[RIGHT]*ROOMBA_PULSES_TO_M - encoder_counts_[LEFT]*ROOMBA_PULSES_TO_M) / -ROOMBA_AXLE_LENGTH;
@@ -1267,7 +1267,7 @@ void irobot::OpenInterface::calculateOdometry()
 
 // *****************************************************************************
 // Reset Roomba odometry
-void irobot::OpenInterface::resetOdometry()
+void rbot::RBotInterface::resetOdometry()
 {
 	this->setOdometry(0.0, 0.0, 0.0);
 }
@@ -1275,7 +1275,7 @@ void irobot::OpenInterface::resetOdometry()
 
 // *****************************************************************************
 // Set Roomba odometry
-void irobot::OpenInterface::setOdometry(double new_x, double new_y, double new_yaw)
+void rbot::RBotInterface::setOdometry(double new_x, double new_y, double new_yaw)
 {
 	this->odometry_x_ = new_x;
 	this->odometry_y_ = new_y;
@@ -1284,79 +1284,16 @@ void irobot::OpenInterface::setOdometry(double new_x, double new_y, double new_y
 
 
 // *****************************************************************************
-// Clean
-int irobot::OpenInterface::clean()
-{
-	return sendOpcode(OI_OPCODE_CLEAN);
-}
-
-
-// *****************************************************************************
-// Max
-int irobot::OpenInterface::max()
-{
-	return sendOpcode(OI_OPCODE_MAX);
-}
-
-
-// *****************************************************************************
-// Spot
-int irobot::OpenInterface::spot()
-{
-	return sendOpcode(OI_OPCODE_SPOT);
-}
-
-
-// *****************************************************************************
 // Go to the dock
-int irobot::OpenInterface::goDock()
+int rbot::RBotInterface::goDock()
 {
 	return sendOpcode(OI_OPCODE_FORCE_DOCK);
 }
 
 
 // *****************************************************************************
-// Compose a song
-int irobot::OpenInterface::setSong(unsigned char song_number, unsigned char song_length, unsigned char *notes, unsigned char *note_lengths)
-{
-	int size = 2*song_length+3;
-	unsigned char cmd_buffer[size];
-	unsigned char i;
-	
-	cmd_buffer[0] = (unsigned char)OI_OPCODE_SONG;
-	cmd_buffer[1] = song_number;
-	cmd_buffer[2] = song_length;
-	
-	for(i=0 ; i < song_length ; i++)
-	{
-		cmd_buffer[3+(2*i)] = notes[i];
-		cmd_buffer[3+(2*i)+1] = note_lengths[i];
-	}
-	
-	try{ serial_port_->write((char*)cmd_buffer, size); }
-	catch(cereal::Exception& e){ return(-1); }
-	return(0);
-}
-
-
-// *****************************************************************************
-// Play a song from the list
-int irobot::OpenInterface::playSong(unsigned char song_number)
-{
-	unsigned char cmd_buffer[2];
-	
-	cmd_buffer[0] = (unsigned char)OI_OPCODE_PLAY;
-	cmd_buffer[1] = song_number;
-	
-	try{ serial_port_->write((char*)cmd_buffer, 2); }
-	catch(cereal::Exception& e){ return(-1); }
-	return(0);
-}
-
-
-// *****************************************************************************
 // Set the LEDs
-int irobot::OpenInterface::setLeds(unsigned char check_robot, unsigned char dock, unsigned char spot, unsigned char debris, unsigned char power_color, unsigned char power_intensity)
+int rbot::RBotInterface::setLeds(unsigned char check_robot, unsigned char dock, unsigned char spot, unsigned char debris, unsigned char power_color, unsigned char power_intensity)
 {
 	unsigned char cmd_buffer[4];
 	cmd_buffer[0] = (unsigned char)OI_OPCODE_LEDS;
@@ -1369,37 +1306,6 @@ int irobot::OpenInterface::setLeds(unsigned char check_robot, unsigned char dock
 	return(0);
 }
 
-
-// *****************************************************************************
-// Set the scheduling LEDs
-int irobot::OpenInterface::setSchedulingLeds(unsigned char sun, unsigned char mon, unsigned char tue, unsigned char wed, unsigned char thu, unsigned char fri, unsigned char sat, unsigned char colon, unsigned char pm, unsigned char am, unsigned char clock, unsigned char schedule)
-{
-	unsigned char cmd_buffer[3];
-	cmd_buffer[0] = OI_OPCODE_SCHEDULE_LEDS;
-	cmd_buffer[1] = sun | mon<<1 | tue<<2 | wed<<3 | thu<<4 | fri<<5 | sat<<6;
-	cmd_buffer[2] = colon | pm<<1 | am<<2 | clock<<3 | schedule<<4;
-	
-	try{ serial_port_->write((char*)cmd_buffer, 3); }
-	catch(cereal::Exception& e){ return(-1); }
-	return(0);
-}
-
-
-// *****************************************************************************
-// Set the digit LEDs
-int irobot::OpenInterface::setDigitLeds(unsigned char digit3, unsigned char digit2, unsigned char digit1, unsigned char digit0)
-{
-	unsigned char cmd_buffer[5];
-	cmd_buffer[0] = (unsigned char)OI_OPCODE_DIGIT_LEDS_ASCII;
-	cmd_buffer[1] = digit3;
-	cmd_buffer[2] = digit2;
-	cmd_buffer[3] = digit1;
-	cmd_buffer[4] = digit0;
-	
-	try{ serial_port_->write((char*)cmd_buffer, 5); }
-	catch(cereal::Exception& e){ return(-1); }
-	return(0);
-}
 
 
 // EOF
