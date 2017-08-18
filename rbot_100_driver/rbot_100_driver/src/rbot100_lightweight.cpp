@@ -100,20 +100,6 @@ int main(int argc, char** argv)
 	ros::Rate r(10.0);
 	while(n.ok())
 	{
-		/*if(inc==true) heartvalue += 20;
-		else heartvalue -= 20;
-		if(heartvalue>=255)
-		{
-			heartvalue = 255;
-			inc=false;
-		}
-		if(heartvalue<=0)
-		{
-			heartvalue = 0;
-			inc=true;
-		}
-		my_robot->setLeds(0, 0, 0, 0, (unsigned char)heartvalue, 255);*/
-
 		current_time = ros::Time::now();
 		
 		last_x = my_robot->odometry_x_;
