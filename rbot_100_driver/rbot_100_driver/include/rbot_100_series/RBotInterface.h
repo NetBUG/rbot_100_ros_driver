@@ -1,67 +1,5 @@
 #include "cereal_port/CerealPort.h"
 
-// Packets sizes
-#define OI_PACKET_GROUP_0_SIZE						26
-#define OI_PACKET_GROUP_1_SIZE						10
-#define OI_PACKET_GROUP_2_SIZE						6
-#define OI_PACKET_GROUP_3_SIZE						10
-#define OI_PACKET_GROUP_4_SIZE						14
-#define OI_PACKET_GROUP_5_SIZE						12
-#define OI_PACKET_GROUP_6_SIZE						52
-#define OI_PACKET_GROUP_100_SIZE					80
-#define OI_PACKET_GROUP_101_SIZE					28
-#define OI_PACKET_GROUP_106_SIZE					12
-#define OI_PACKET_GROUP_107_SIZE					9
-#define OI_PACKET_BUMPS_DROPS_SIZE					1
-#define OI_PACKET_WALL_SIZE							1
-#define OI_PACKET_CLIFF_LEFT_SIZE					1
-#define OI_PACKET_CLIFF_FRONT_LEFT_SIZE				1
-#define OI_PACKET_CLIFF_FRONT_RIGHT_SIZE			1
-#define OI_PACKET_CLIFF_RIGHT_SIZE					1
-#define OI_PACKET_VIRTUAL_WALL_SIZE					1
-#define OI_PACKET_WHEEL_OVERCURRENTS_SIZE			1
-#define OI_PACKET_DIRT_DETECT_SIZE					1	
-#define OI_PACKET_IR_CHAR_OMNI_SIZE					1
-#define OI_PACKET_IR_CHAR_LEFT_SIZE					1
-#define OI_PACKET_IR_CHAR_RIGHT_SIZE				1
-#define OI_PACKET_BUTTONS_SIZE						1	
-#define OI_PACKET_DISTANCE_SIZE						2
-#define OI_PACKET_ANGLE_SIZE						2
-#define OI_PACKET_CHARGING_STATE_SIZE				1
-#define OI_PACKET_VOLTAGE_SIZE						2
-#define OI_PACKET_CURRENT_SIZE						2
-#define OI_PACKET_TEMPERATURE_SIZE					1
-#define OI_PACKET_BATTERY_CHARGE_SIZE				2
-#define OI_PACKET_BATTERY_CAPACITY_SIZE				2
-#define OI_PACKET_WALL_SIGNAL_SIZE					2
-#define OI_PACKET_CLIFF_LEFT_SIGNAL_SIZE			2
-#define OI_PACKET_CLIFF_FRONT_LEFT_SIGNAL_SIZE		2
-#define OI_PACKET_CLIFF_FRONT_RIGHT_SIGNAL_SIZE		2
-#define OI_PACKET_CLIFF_RIGHT_SIGNAL_SIZE			2
-#define OI_PACKET_CHARGE_SOURCES_SIZE				1
-#define OI_PACKET_OI_MODE_SIZE						1
-#define OI_PACKET_SONG_NUMBER_SIZE					1
-#define OI_PACKET_SONG_PLAYING_SIZE					1
-#define OI_PACKET_STREAM_PACKETS_SIZE				1
-#define OI_PACKET_REQ_VELOCITY_SIZE					2
-#define OI_PACKET_REQ_RADIUS_SIZE					2
-#define OI_PACKET_REQ_RIGHT_VELOCITY_SIZE			2
-#define OI_PACKET_REQ_LEFT_VELOCITY_SIZE			2
-#define OI_PACKET_RIGHT_ENCODER_SIZE				2
-#define OI_PACKET_LEFT_ENCODER_SIZE					2
-#define OI_PACKET_LIGHT_BUMPER_SIZE					1
-#define OI_PACKET_LIGHT_BUMPER_LEFT_SIZE			2
-#define OI_PACKET_LIGHT_BUMPER_FRONT_LEFT_SIZE		2
-#define OI_PACKET_LIGHT_BUMPER_CENTER_LEFT_SIZE		2
-#define OI_PACKET_LIGHT_BUMPER_CENTER_RIGHT_SIZE	2
-#define OI_PACKET_LIGHT_BUMPER_FRONT_RIGHT_SIZE		2
-#define OI_PACKET_LIGHT_BUMPER_RIGHT_SIZE			2
-#define OI_PACKET_LEFT_MOTOR_CURRENT_SIZE			2	
-#define OI_PACKET_RIGHT_MOTOR_CURRENT_SIZE			2
-#define OI_PACKET_BRUSH_MOTOR_CURRENT_SIZE			2
-#define OI_PACKET_SIDE_BRUSH_MOTOR_CURRENT_SIZE		2
-#define OI_PACKET_STASIS_SIZE						1
-
 // OI Modes
 #define OI_MODE_OFF				0
 #define OI_MODE_PASSIVE			1
@@ -146,6 +84,7 @@ byte RBOT_HEAD_DOWN[8] = {0x05, 0x7C, 0x03, 0x00, 0x02, 0x00, 0x86};    // {head
 byte RBOT_HEAD_UP[8] = {0x05, 0x7C, 0x03, 0x00, 0xFE, 0x00, 0x82};    // {head up};
 byte RBOT_UNLOCK[8] = {0xFE, 0x20, 0x01, 0xFF, 0x1E};      // Unlock Live mode
 
+#define SERIAL_SPEED		57600		// RBot uses 57600, 8 bit, no parity check
 
 #ifndef MIN
 #define MIN(a,b) ((a < b) ? (a) : (b))
@@ -197,78 +136,6 @@ namespace rbot
 
 	} OI_Opcode;
 
-
-	//! OI packet id
-	/*!
-	 * Packet ids for sensors as specified by the iRobot Open Interface.
-	 */
-	typedef enum _OI_Packet_ID {
-	
-		// Sensor Packets
-		OI_PACKET_GROUP_0 = 0,			//! OI packets 7-26
-		OI_PACKET_GROUP_1 = 1,			//! OI packets 7-16
-		OI_PACKET_GROUP_2 = 2,			//! OI packets 17-20
-		OI_PACKET_GROUP_3 = 3,			//! OI packets 21-26
-		OI_PACKET_GROUP_4 = 4,			//! OI packets 27-34
-		OI_PACKET_GROUP_5 = 5,			//! OI packets 35-42
-		OI_PACKET_GROUP_6 = 6,			//! OI packets 7-42
-		OI_PACKET_GROUP_100 = 100,		//! OI packets 7-58
-		OI_PACKET_GROUP_101 = 101,		//! OI packets 43-58
-		OI_PACKET_GROUP_106 = 106,		//! OI packets 46-51
-		OI_PACKET_GROUP_107 = 107,		//! OI packets 54-58
-		OI_PACKET_BUMPS_DROPS = 7,
-		OI_PACKET_WALL = 8,
-		OI_PACKET_CLIFF_LEFT = 9,
-		OI_PACKET_CLIFF_FRONT_LEFT = 10,
-		OI_PACKET_CLIFF_FRONT_RIGHT = 11,
-		OI_PACKET_CLIFF_RIGHT = 12,
-		OI_PACKET_VIRTUAL_WALL = 13,
-		OI_PACKET_WHEEL_OVERCURRENTS = 14,
-		OI_PACKET_DIRT_DETECT = 15,
-		OI_PACKET_IR_CHAR_OMNI = 17,
-		OI_PACKET_BUTTONS = 18,
-		OI_PACKET_DISTANCE = 19,
-		OI_PACKET_ANGLE = 20,
-		OI_PACKET_CHARGING_STATE = 21,
-		OI_PACKET_VOLTAGE = 22,
-		OI_PACKET_CURRENT = 23,
-		OI_PACKET_TEMPERATURE = 24,
-		OI_PACKET_BATTERY_CHARGE = 25,
-		OI_PACKET_BATTERY_CAPACITY = 26,
-		OI_PACKET_WALL_SIGNAL = 27,
-		OI_PACKET_CLIFF_LEFT_SIGNAL = 28,
-		OI_PACKET_CLIFF_FRONT_LEFT_SIGNAL = 29,
-		OI_PACKET_CLIFF_FRONT_RIGHT_SIGNAL = 30,
-		OI_PACKET_CLIFF_RIGHT_SIGNAL = 31,
-		OI_PACKET_CHARGE_SOURCES = 34,
-		OI_PACKET_OI_MODE = 35,
-		OI_PACKET_SONG_NUMBER = 36,
-		OI_PACKET_SONG_PLAYING = 37,
-		OI_PACKET_STREAM_PACKETS = 38,
-		OI_PACKET_REQ_VELOCITY = 39,
-		OI_PACKET_REQ_RADIUS = 40,
-		OI_PACKET_REQ_RIGHT_VELOCITY = 41,
-		OI_PACKET_REQ_LEFT_VELOCITY = 42,
-		OI_PACKET_RIGHT_ENCODER = 43,
-		OI_PACKET_LEFT_ENCODER = 44,
-		OI_PACKET_LIGHT_BUMPER = 45,
-		OI_PACKET_LIGHT_BUMPER_LEFT = 46,
-		OI_PACKET_LIGHT_BUMPER_FRONT_LEFT = 47,
-		OI_PACKET_LIGHT_BUMPER_CENTER_LEFT = 48,
-		OI_PACKET_LIGHT_BUMPER_CENTER_RIGHT = 49,
-		OI_PACKET_LIGHT_BUMPER_FRONT_RIGHT = 50,
-		OI_PACKET_LIGHT_BUMPER_RIGHT = 51,
-		OI_PACKET_IR_CHAR_LEFT = 52,
-		OI_PACKET_IR_CHAR_RIGHT = 53,
-		OI_PACKET_LEFT_MOTOR_CURRENT = 54,
-		OI_PACKET_RIGHT_MOTOR_CURRENT = 55,
-		OI_PACKET_BRUSH_MOTOR_CURRENT = 56,
-		OI_PACKET_SIDE_BRUSH_MOTOR_CURRENT = 57,
-		OI_PACKET_STASIS = 58
-	
-	} OI_Packet_ID;
-
-
 	/*! \class RBotInterface RBotInterface.h "include/RBotInterface.h"
 	 *  \brief C++ class implementation of the RBot 100 Interface.
 	 *
@@ -292,9 +159,9 @@ namespace rbot
 	
 		//! Open the serial port
 		/*!
-		 *  \param full_control    Whether to set the Roomba on OImode full or not.
+		 *  \param full_init    Send full init sequence including head zeroing to RBot
 		 */
-		int openSerialPort(bool full_control);
+		int openSerialPort(bool full_init);
 		//! Close the serial port
 		int closeSerialPort();
 	
@@ -324,13 +191,6 @@ namespace rbot
 		*/
 		int getSensorPackets(int timeout);
 		
-		//! Stream sensor packets. NOT TESTED
-		int streamSensorPackets();
-		//! Start stream. NOT TESTED
-		int startStream();
-		//! Stom stream. NOT TESTED
-		int stopStream();
-	
 		//! Calculate Roomba odometry. Call after reading encoder pulses.
 		void calculateOdometry();
 	
@@ -354,41 +214,7 @@ namespace rbot
 		*  \return 0 if ok, -1 otherwise.
 		*/
 		int driveDirect(int left_speed, int right_speed);
-		//! Drive PWM
-		/*!
-		*  Set the motors pwms. NOT IMPLEMENTED
-		*
-		*  \param left_pwm  	Left wheel motor pwm.
-		*  \param right_pwm  	Right wheel motor pwm.
-		*
-		*  \return 0 if ok, -1 otherwise.
-		*/
-		int drivePWM(int left_pwm, int right_pwm);
-	
-		//! Set brushes
-		/*!
-		*  Set the various brushes motors.
-		*
-		*  \param side_brush  			Side brush on (1) or off (0).
-		*  \param vacuum  				Vacuum on (1) or off (0).
-		*  \param main_brush 			Main brush on (1) or off (0).
-		*  \param side_brush_clockwise 	Wether to rotate the side brush clockwise or not.
-		*  \param main_brush_dir 		Main brush direction.
-		*
-		*  \return 0 if ok, -1 otherwise.
-		*/
-		int brushes(unsigned char side_brush, unsigned char vacuum, unsigned char main_brush, unsigned char side_brush_clockwise, unsigned char main_brush_dir);
-		//! Set brushes motors pwms
-		/*!
-		*  Set the brushes motors pwms. This is very interesting. One could disconnect the motors and plug other actuators that could be controller over pwm on the Roomba.
-		*
-		*  \param main_brush 	Main brush motor pwm.
-		*  \param side_brush  	Side brush motor pwm.
-		*  \param vacuum  		Vacuum motor pwm.
-		*
-		*  \return 0 if ok, -1 otherwise.
-		*/
-		int brushesPWM(char main_brush, char side_brush, char vacuum);
+
 	
 		//! Set the Roomba in cleaning mode. Returns the OImode to safe.
 		int clean();
@@ -400,78 +226,6 @@ namespace rbot
 		int goDock();
 	
 		
-		//! Set song
-		/*!
-		*  Record a song on Roombas memory. Songs can be played with playSong().
-		*
-		*  \param song_number 	Song id (from 0 to 15) so you can play it later.
-		*  \param song_length  	Number of notes in the song.
-		*  \param notes  		Array of notes.
-		*  \param note_lengths  Array of notes length.
-		*
-		*  \sa playSong()
-		*
-		*  \return 0 if ok, -1 otherwise.
-		*/
-		int setSong(unsigned char song_number, unsigned char song_length, unsigned char *notes, unsigned char *note_lengths);
-		//! Play song
-		/*!
-		*  Play a song previously recorded on Roombas memory. You can only play songs stored with setSong().
-		*
-		*  \param song_number 	Song id (from 0 to 15) so you can play it later.
-		*
-		*  \sa setSong()
-		*
-		*  \return 0 if ok, -1 otherwise.
-		*/
-		int playSong(unsigned char song_number);
-	
-		//! Set leds
-		/*!
-		*  Set the leds state on the Roomba.
-		*
-		*  \param check_robot 		Check robot led.
-		*  \param dock		 		Dock led.
-		*  \param spot		 		Spot led.
-		*  \param debris			Debris led.
-		*  \param power_color		Power led color, varies from green (yellow, orange) to red.
-		*  \param power_intensity	Power led intensity.
-		*
-		*  \return 0 if ok, -1 otherwise.
-		*/
-		int setLeds(unsigned char check_robot, unsigned char dock, unsigned char spot, unsigned char debris, unsigned char power_color, unsigned char power_intensity);
-		//! Set scheduling leds
-		/*!
-		*  Set the leds state on the Roomba.
-		*
-		*  \param sun 		Sunday, 1 on, 0 off.
-		*  \param mon		Monday, 1 on, 0 off.
-		*  \param tue		Tuesday, 1 on, 0 off.
-		*  \param wed		You get the idea...
-		*  \param thu		...
-		*  \param fri		Boooooring!
-		*  \param sat		Saturday, pfew!
-		*  \param colon		Colon on the clock.
-		*  \param pm		PM.
-		*  \param am		AM.
-		*  \param clock		Clock.
-		*  \param schedule	Schedule.
-		*
-		*  \return 0 if ok, -1 otherwise.
-		*/
-		int setSchedulingLeds(unsigned char sun, unsigned char mon, unsigned char tue, unsigned char wed, unsigned char thu, unsigned char fri, unsigned char sat, unsigned char colon, unsigned char pm, unsigned char am, unsigned char clock, unsigned char schedule);
-		//! Set digit leds
-		/*!
-		*  Set the digit leds on the Roomba, the ones on the clock. Digits are ordered from left to right on the robot, 3, 2, 1, 0.
-		*
-		*  \param digit3 		Digit 3
-		*  \param digit2		Digit 2
-		*  \param digit1		Digit 1
-		*  \param digit0		Digit 0
-		*
-		*  \return 0 if ok, -1 otherwise.
-		*/
-		int setDigitLeds(unsigned char digit3, unsigned char digit2, unsigned char digit1, unsigned char digit0);
 	
 		//! Current operation mode, one of ROOMBA_MODE_'s
 		unsigned char OImode_;
@@ -488,20 +242,6 @@ namespace rbot
 		double odometry_yaw_;
 	
 		bool wall_;						//! Wall detected.
-		bool virtual_wall_;				//! Virtual wall detected.
-		bool cliff_[4];					//! Cliff sensors. Indexes: LEFT FRONT_LEFT FRONT_RIGHT RIGHT
-		bool bumper_[2];				//! Bumper sensors. Indexes: LEFT RIGHT
-		bool ir_bumper_[6];				//! IR bumper sensors. Indexes: LEFT FRONT_LEFT CENTER_LEFT CENTER_RIGHT FRONT_RIGHT RIGHT
-		bool wheel_drop_[2];			//! Wheel drop sensors: Indexes: LEFT RIGHT
-		int wall_signal_;				//! Wall signal.
-		int cliff_signal_[4];			//! CLiff sensors signal. Indexes: LEFT FRONT_LEFT FRONT_RIGHT RIGHT
-		int ir_bumper_signal_[6];		//! IR bumper sensors signal. Indexes: LEFT FRONT_LEFT CENTER_LEFT CENTER_RIGHT FRONT_RIGHT RIGHT
-		unsigned char ir_char_[3];		//! IR characters received. Indexes: OMNI LEFT RIGHT
-	
-		bool buttons_[8];				//! Buttons. Indexes: BUTTON_CLOCK BUTTON_SCHEDULE BUTTON_DAY BUTTON_HOUR BUTTON_MINUTE BUTTON_DOCK BUTTON_SPOT BUTTON_CLEAN
-	
-		unsigned char dirt_detect_;		//! Dirt detected
-	
 		int motor_current_[4];			//! Motor current. Indexes: LEFT RIGHT MAIN_BRUSH SIDE_BRUSH
 		bool overcurrent_[4];			//! Motor overcurrent. Indexes: LEFT RIGHT MAIN_BRUSH SIDE_BRUSH
 	
