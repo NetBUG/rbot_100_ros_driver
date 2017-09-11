@@ -185,6 +185,27 @@ int rbot::RBotInterface::drive(double linear_speed, double angular_speed)
 
 // *****************************************************************************
 // Set the motor speeds
+/*int rbot::RBotInterface::driveDirect(int left_speed, int right_speed)
+{
+	// Limit velocity
+	int16_t left_speed_mm_s = MAX(left_speed, -ROOMBA_MAX_LIN_VEL_MM_S);
+	left_speed_mm_s = MIN(left_speed, ROOMBA_MAX_LIN_VEL_MM_S);
+	int16_t right_speed_mm_s = MAX(right_speed, -ROOMBA_MAX_LIN_VEL_MM_S);
+	right_speed_mm_s = MIN(right_speed, ROOMBA_MAX_LIN_VEL_MM_S);
+	
+	// Compose comand
+	char cmd_buffer[5];
+	cmd_buffer[0] = (char)OI_OPCODE_DRIVE_DIRECT;
+	cmd_buffer[1] = (char)(right_speed_mm_s >> 8);
+	cmd_buffer[2] = (char)(right_speed_mm_s & 0xFF);
+	cmd_buffer[3] = (char)(left_speed_mm_s >> 8);
+	cmd_buffer[4] = (char)(left_speed_mm_s & 0xFF);
+
+	try{ serial_port_->write(cmd_buffer, 5); }
+	catch(cereal::Exception& e){ return(-1); }
+
+	return(0);
+}*/
 int rbot::RBotInterface::driveDirect(int left_speed, int right_speed)
 {
 	// Limit velocity
@@ -206,7 +227,6 @@ int rbot::RBotInterface::driveDirect(int left_speed, int right_speed)
 
 	return(0);
 }
-
 
 
 // *****************************************************************************
