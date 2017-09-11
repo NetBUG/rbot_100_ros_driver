@@ -16,17 +16,14 @@ jobs:
       #      sleep 1
       #    done
       #    echo Failed waiting for Postgres && exit 1
-#      - run:
-#          name: Installing Go 1.7
-#          environment:
-#            GOPATH_REPO: ${GOPATH%%:*}/src/github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
-#          command: |
-#            curl -o go.tar.gz -sL https://golang.org/dl/go1.7.3.linux-amd64.tar.gz
-#            sudo rm -rf /usr/local/go
-#            sudo tar -C /usr/local -xzf go.tar.gz
-#            sudo chmod a+w /usr/local/go/src/
-      - run: go get github.com/jstemmer/go-junit-report
-      - run: go get github.com/Masterminds/glide
+      - run:
+          name: Installing Glide
+          environment:
+            GOPATH_REPO: ${GOPATH%%:*}/src/github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
+          command: |
+            sudo add-apt-repository ppa:masterminds/glide -y
+            sudo apt-get update
+            sudo apt-get install glide -y
       - run:
           name: Run unit tests
           environment:
