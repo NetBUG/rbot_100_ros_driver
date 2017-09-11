@@ -38,6 +38,7 @@ jobs:
             GOPATH_REPO: ${GOPATH%%:*}/src/github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
             PATH: /usr/local/go/bin:$PATH
           command: |
+            export GOPATH=`pwd`
             go get github.com/Masterminds/glide
             cd $GOPATH_REPO && glide novendor | xargs go test -v
       - run:
