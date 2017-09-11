@@ -1,7 +1,7 @@
 machine:
   environment:
     GO15VENDOREXPERIMENT: 1
-    GOPATH_REPO: ${GOPATH%%:*}/src/github.com/CiscoZeus/zeus-analytics
+    GOPATH_REPO: ${GOPATH%%:*}/src/github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
     HOME_REPO: ${HOME}/${CIRCLE_PROJECT_REPONAME}
   pre:
     # Change Golang version from Circle default(1.5.3) to the latest
