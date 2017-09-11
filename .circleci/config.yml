@@ -1,0 +1,39 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/python:3.6.1	# for Job Registry / data backend
+      - image: circleci/golang:1.8	# for App Registry
+    steps:
+      - checkout
+      - run:
+          name: Waiting for Postgres to be ready
+          command: |
+            for i in `seq 1 10`;
+            do
+              nc -z localhost 5432 && echo Success && exit 0
+              echo -n .
+              sleep 1
+            done
+            echo Failed waiting for Postgres && exit 1
+      - run: pip install -r python_demo/requirements.txt
+      - run:
+          name: Run unit tests
+          environment:
+            GOPATH_REPO: ${GOPATH%%:*}/src/github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
+          command: |
+            go get github.com/Masterminds/glide
+            cd $GOPATH_REPO && glide novendor | xargs go test -v
+      - run:
+          name: Start service
+          environment:
+            GOPATH_REPO: ${GOPATH%%:*}/src/github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
+          command: |
+                cd $GOPATH_REPO && glide install; true
+          #background: true
+      - run:
+          name: Validate service is working
+          command: curl --retry 10 --retry-delay 1 --retry-connrefused http://localhost:8080/contacts/test
+      - store_artifacts:
+          path: test-reports/
+          destination: tr1
