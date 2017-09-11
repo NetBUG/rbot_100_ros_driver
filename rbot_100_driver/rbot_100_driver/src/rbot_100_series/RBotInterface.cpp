@@ -63,11 +63,6 @@ rbot::RBotInterface::RBotInterface(const char * new_serial_port)
 	num_of_packets_ = 0;
 	sensor_packets_ = NULL;
 	packets_size_ = 0;
-	
-	// Default packets
-	OI_Packet_ID default_packets[2] = {OI_PACKET_RIGHT_ENCODER, OI_PACKET_LEFT_ENCODER};
-	this->setSensorPackets(default_packets, 2, OI_PACKET_RIGHT_ENCODER_SIZE + OI_PACKET_LEFT_ENCODER_SIZE);
-
 	serial_port_ = new cereal::CerealPort();
 }
 
@@ -231,7 +226,7 @@ int rbot::RBotInterface::driveDirect(int left_speed, int right_speed)
 
 // *****************************************************************************
 // Set the sensors to read
-int rbot::RBotInterface::setSensorPackets(OI_Packet_ID * new_sensor_packets, int new_num_of_packets, size_t new_buffer_size)
+int rbot::RBotInterface::setSensorPackets(int * new_sensor_packets, int new_num_of_packets, size_t new_buffer_size)
 {
 	if(sensor_packets_ == NULL)
 	{
@@ -239,12 +234,6 @@ int rbot::RBotInterface::setSensorPackets(OI_Packet_ID * new_sensor_packets, int
 	}
 	
 	num_of_packets_ = new_num_of_packets;
-	sensor_packets_ = new OI_Packet_ID[num_of_packets_];
-	
-	for(int i=0 ; i<num_of_packets_ ; i++)
-	{
-		sensor_packets_[i] = new_sensor_packets[i];
-	}
 
 	stream_defined_ = false;
 	packets_size_ = new_buffer_size;
