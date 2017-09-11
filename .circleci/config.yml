@@ -34,6 +34,8 @@ jobs:
 #            export GOPATH=`pwd`
           command: |
             echo $GOPATH
+            pwd
+            glide novendor
             cd $GOPATH_REPO && glide novendor | xargs go test -v
       - run:
           name: Start service
