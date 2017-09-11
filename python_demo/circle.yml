@@ -1,0 +1,23 @@
+machine:
+  environment:
+    HOME_REPO: ${HOME}/${CIRCLE_PROJECT_REPONAME}
+  python:
+    version: 3.6.2
+  pre:
+    # Installing Python dependencies?
+    # - curl -o go.tar.gz -sL https://golang.org/dl/go1.7.3.linux-amd64.tar.gz
+    # - sudo rm -rf /usr/local/go
+    # - sudo tar -C /usr/local -xzf go.tar.gz
+    # - sudo chmod a+w /usr/local/go/src/
+  post:
+    - rm -rf $HOME_REPO
+dependencies:
+  pre:
+    # Install project dependencies: unnecessary, CircleCI does it automagically: https://circleci.com/docs/1.0/language-python/
+    # - pip3 install -r requirements.txt
+  override:
+    - pip install autobahn
+test:
+  override:
+    # We only wish to test our packages not vendored ones
+    - cd $GOPATH_REPO && glide novendor | xargs go test -v
