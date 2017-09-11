@@ -16,7 +16,12 @@ jobs:
       #      sleep 1
       #    done
       #    echo Failed waiting for Postgres && exit 1
-      - run: pip install -r python_demo/requirements.txt
+      - run:
+          name: Install Python deps in a venv
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            pip install -r python_demo/requirements.txt
       - run:
           name: Run unit tests
           environment:
