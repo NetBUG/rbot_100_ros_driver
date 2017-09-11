@@ -23,6 +23,15 @@ jobs:
             . venv/bin/activate
             pip install -r python_demo/requirements.txt
       - run:
+          name: Installing Go 1.7
+          environment:
+            GOPATH_REPO: ${GOPATH%%:*}/src/github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
+          command: |
+            curl -o go.tar.gz -sL https://golang.org/dl/go1.7.3.linux-amd64.tar.gz
+            sudo rm -rf /usr/local/go
+            sudo tar -C /usr/local -xzf go.tar.gz
+            sudo chmod a+w /usr/local/go/src/
+      - run:
           name: Run unit tests
           environment:
             GOPATH_REPO: ${GOPATH%%:*}/src/github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
