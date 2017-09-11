@@ -1,0 +1,22 @@
+package: github.com/CiscoZeus/zeus-analytics/registry
+import:
+- package: github.com/gin-gonic/gin
+  version: v1.1.4
+- package: github.com/jinzhu/gorm
+  version: v1.0
+- package: github.com/jmoiron/sqlx
+- package: github.com/spf13/viper
+- package: github.com/mattn/go-sqlite3
+  version: v1.2.0
+- package: github.com/satori/go.uuid
+  version: v1.1.0
+- package: github.com/mattn/go-isatty
+  version: v0.0.1
+- package: github.com/rs/cors
+  version: v1.0
+- package: github.com/rs/xhandler
+  version: v1.0
+- package: github.com/lib/pq
+- package: github.com/franela/goreq
+- package: github.com/asaskevich/govalidator
+  version: v5

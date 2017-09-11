@@ -1,0 +1,29 @@
+machine:
+  environment:
+    GO15VENDOREXPERIMENT: 1
+    GOPATH_REPO: ${GOPATH%%:*}/src/github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
+    HOME_REPO: ${HOME}/${CIRCLE_PROJECT_REPONAME}
+  pre:
+    # Change Golang version from Circle default(1.5.3) to the latest
+    - curl -o go.tar.gz -sL https://golang.org/dl/go1.7.3.linux-amd64.tar.gz
+    - sudo rm -rf /usr/local/go
+    - sudo tar -C /usr/local -xzf go.tar.gz
+    - sudo chmod a+w /usr/local/go/src/
+  post:
+    # Building directory structure (this is because of glide)
+    - mkdir -p $GOPATH_REPO
+    # Will overwrite anything from cache, note trailing slash on source matters
+    - rsync -a --delete $HOME_REPO/ $GOPATH_REPO
+    - rm -rf $HOME_REPO
+    # Let our build_dir point a go src location
+    - ln -s $GOPATH_REPO $HOME_REPO
+dependencies:
+  pre:
+    # Install project dependencies
+    - go get github.com/Masterminds/glide
+  override:
+    - cd $GOPATH_REPO && glide install; true
+test:
+  override:
+    # We only wish to test our packages not vendored ones
+    - cd $GOPATH_REPO && glide novendor | xargs go test -v
