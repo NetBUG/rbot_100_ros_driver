@@ -33,13 +33,14 @@ jobs:
 #            go get github.com/Masterminds/glide
 #            export GOPATH=`pwd`
           command: |
+            echo $GOPATH
             cd $GOPATH_REPO && glide novendor | xargs go test -v
       - run:
           name: Start service
           environment:
             GOPATH_REPO: ${GOPATH%%:*}/src/github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
           command: |
-                cd $GOPATH_REPO && glide install; true
+            cd $GOPATH_REPO && glide install; true
           #background: true
       - run:
           name: Validate service is working
