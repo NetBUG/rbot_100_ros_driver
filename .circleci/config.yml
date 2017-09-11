@@ -31,8 +31,8 @@ jobs:
             GOPATH_REPO: ${GOPATH%%:*}/src/github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
             PATH: /usr/local/go/bin:$PATH
 #            go get github.com/Masterminds/glide
+#            export GOPATH=`pwd`
           command: |
-            export GOPATH=`pwd`
             cd $GOPATH_REPO && glide novendor | xargs go test -v
       - run:
           name: Start service
